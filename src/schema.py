@@ -2,6 +2,13 @@ from typing import Dict
 
 
 class SchemaBody:
+    def __init__(self, fields):
+        self.fields = fields
+        type_of: str = fields['Tipo'],
+        name: str = fields["Campo"],
+        size: str = fields["Tamanho"],
+        is_null: str = fields["Aceita"],
+        description: str = fields["Comentários"]
 
     def __str__(self):
         return self.name + "(" + str(self.fields) + ")"
@@ -16,7 +23,7 @@ class SchemaBody:
             elif typeof == 'fixed':
                 seted_type = {
                     "name": name,
-                    "size": size,
+                    "size": int(size),
                     "type": typeof
                 }
             elif typeof == 'float':
@@ -32,20 +39,28 @@ class SchemaBody:
         except Exception as e:
             print(e)
 
-    def create_node(self, typeof: str = 'string', name: str = None, size: str = None, is_null: str = None, comentarios: str = None):
+    def create_node(self,
+                    type_of: str,
+                    name: str,
+                    size: int,
+                    is_null: str,
+                    description: str) -> Dict:
         is_nullable: bool = True if 'Sim' in is_null else False
         node = {}
+
         if is_nullable:
             node = {
                 "default": "null",
-                "doc": comentarios,
+                "doc": description,
                 "name": name,
-                "type": ["null", self._set_type(typeof, size=size, name=name)],
+                "type": ["null", self._set_type(type_of, size=size, name=name)],
             }
+
         else:
             node = {
-                "doc": comentarios,
+                "doc": description,
                 "name": name,
-                "type": self._set_type(typeof, size=size, name=name),
+                "type": self._set_type(type_of, size=size, name=name),
             }
+
         return node
