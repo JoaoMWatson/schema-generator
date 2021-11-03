@@ -4,7 +4,7 @@ import json
 import typer
 import pandas as pd
 from rich.console import Console
-from src.schema import SchemaBody
+from src.schema_body import SchemaBody
 
 
 app = typer.Typer()
@@ -15,7 +15,7 @@ cur_path = os.path.dirname(__file__)
 @app.command()
 def main(file: str = typer.Argument(..., help="File to parse"), sheet_number: int = typer.Argument(..., help="Sheet number to parse"), topic_name: str = typer.Argument(..., help="Topic name to parse")):
     """
-    Parse a CSV file and create a topic in the specified topic name.
+    Parse a XLSX file and create a topic in the specified topic name.
     """
     try:
         new_path: str = os.path.relpath(file, cur_path)
@@ -25,21 +25,13 @@ def main(file: str = typer.Argument(..., help="File to parse"), sheet_number: in
 
         schema_body = SchemaBody(dataFrame)
 
-        fields = []
-        for index, row in dataFrame.iterrows():
-            fields.append(schema_body.create_node(
-                type_of=row["Tipo"],
-                name=row["Campo"],
-                size=row["Tamanho"],
-                is_null=row["Aceita"],
-                description=row['Comentários'])
-            )
+        body = schema_body.make_body()
+
+        console.log(body)
+        # console.print(f"Topic {topic_name} created successfully!")
 
         with open(f"{topic_name}-value.json", "w", encoding='utf8') as file:
-            json.dump(fields, file, ensure_ascii=False)
-
-        # console.print(f"Topic {topic_name} created successfully!")
-        console.log(fields)
+            json.dump(body, file, ensure_ascii=False)
 
     except IOError:
         console.print("[bold red]File not found[/bold red]")

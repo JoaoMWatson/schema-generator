@@ -2,19 +2,19 @@ from typing import Dict
 
 
 class SchemaBody:
-    def __init__(self, fields):
-        self.fields = fields
-        type_of: str = fields['Tipo'],
-        name: str = fields["Campo"],
-        size: str = fields["Tamanho"],
-        is_null: str = fields["Aceita"],
-        description: str = fields["Comentários"]
+    def __init__(self, dataFrame):
+        self.dataFrame = dataFrame
+        type_of: str = dataFrame['Tipo'],
+        name: str = dataFrame["Campo"],
+        size: str = dataFrame["Tamanho"],
+        is_null: str = dataFrame["Aceita"],
+        description: str = dataFrame["Comentários"]
 
     def __str__(self):
-        return self.name + "(" + str(self.fields) + ")"
+        return self.name + "(" + str(self.dataFrame) + ")"
 
     def __repr__(self):
-        return self.name + "(" + str(self.fields) + ")"
+        return self.name + "(" + str(self.dataFrame) + ")"
 
     def _set_type(self, typeof: str = 'string', name: str = None, size: str = None):
         try:
@@ -64,3 +64,17 @@ class SchemaBody:
             }
 
         return node
+    
+
+    def make_body(self):
+        fields = []
+        for index, row in self.dataFrame.iterrows():
+            fields.append(self.create_node(
+                type_of=row["Tipo"],
+                name=row["Campo"],
+                size=row["Tamanho"],
+                is_null=row["Aceita"],
+                description=row['Comentários'])
+            )
+        
+        return {"fields": fields}
