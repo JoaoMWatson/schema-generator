@@ -66,7 +66,7 @@ class SchemaBody:
         return node
     
 
-    def make_body(self):
+    def make_body(self) -> Dict:
         fields = []
         for index, row in self.dataFrame.iterrows():
             fields.append(self.create_node(
