@@ -22,26 +22,29 @@ def main(file: str = typer.Argument(..., help="File to parse"),
     Parse a XLSX file and create a topic in the specified topic name.
     """
     try:
-        new_path: str = os.path.relpath(file, cur_path)
+        if not os.path.exists(file):
+            raise(f"{FileNotFoundError}. File not found in path {file}")
+        else:
+            dataFrame: pd.DataFrame = pd.read_excel(
+                file, sheet_name=sheet_number, header=19, usecols="B:D, F, H").dropna()
 
-        dataFrame: pd.DataFrame = pd.read_excel(
-            new_path, sheet_name=sheet_number, header=19, usecols="B:D, F, H").dropna()
+            schema_body = SchemaBody(dataFrame)
+            schema_structure = SchemaStructure(topic_name, schema_description=schema_description)
+            
+            header = schema_structure.make_header()
+            body = schema_body.make_body()
+            footer = schema_structure.make_footer()
+            
+            full_schema = header | body | footer
 
-        schema_body = SchemaBody(dataFrame)
-        schema_structure = SchemaStructure(topic_name, schema_description=schema_description)
-        
-        header = schema_structure.make_header()
-        body = schema_body.make_body()
-        footer = schema_structure.make_footer()
-        
-        full_schema = header | body | footer
-    
-        
-        with open(f"{topic_name}-value.json", "w", encoding='utf8') as file:
-            json.dump(full_schema, file, ensure_ascii=False)
+            
+            with open(f"{topic_name}-value.json", "w", encoding='utf8') as file:
+                json.dump(full_schema, file, ensure_ascii=False)
 
     except IOError:
-        console.print("[bold red]File not found[/bold red]")
+        console.print_exception("[bold red]File not found[/bold red]")
+    except Exception as e:
+        console.print_exception(e)
 
 
 if __name__ == "__main__":
