@@ -1,2 +1,0 @@
-from schema_body import SchemaBody
-from schema_structure import SchemaStructure

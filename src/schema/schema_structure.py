@@ -1,5 +1,4 @@
 from typing import Dict
-from schema_body import SchemaBody
 
 class SchemaStructure:
     def __init__(self, topic_name: str, schema_description: str, schema_body: Dict):

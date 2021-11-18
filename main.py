@@ -4,8 +4,8 @@ import json
 import typer
 import pandas as pd
 from rich.console import Console
-from src.schema import SchemaBody
-from src.schema import SchemaStructure
+from src.schema.schema_body import SchemaBody
+from src.schema.schema_structure import SchemaStructure
 
 
 app = typer.Typer()
@@ -23,7 +23,7 @@ def main(file: str = typer.Argument(..., help="File to parse"),
     """
     try:
         if not os.path.exists(file):
-            raise(FileNotFoundError)
+            raise FileNotFoundError(f"File: {file} not found")
         else:
             dataFrame: pd.DataFrame = pd.read_excel(
                 file, sheet_name=sheet_number, header=19, usecols="B:D, F, H").dropna()
@@ -37,17 +37,19 @@ def main(file: str = typer.Argument(..., help="File to parse"),
             with open(f"{topic_name}-value.json", "w", encoding='utf8') as file:
                 json.dump(full_schema, file, ensure_ascii=False)
 
-    except IOError as e:
-        console.print_exception("[bold red]File not found[/bold red]")
     except Exception as e:
-        console.print_exception(show_locals=e)
+        console.print_exception()
+        print(e)
+
     except OSError as e:
         console.log("[bold red]Could not open/read file: [/bold red]", file)
-        console.print_exception(show_locals=e)
+        console.print_exception()
+        print(e)
+
     except FileNotFoundError as e:
         console.log("[bold red]File could not be found: [/bold red]", file)
-        console.print_exception(show_locals=e)
-        
+        console.print_exception()
+        print(e)
 
 
 if __name__ == "__main__":

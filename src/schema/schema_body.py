@@ -18,7 +18,7 @@ class SchemaBody:
 
     def _set_type(self, typeof: str = 'string', name: str = None, size: str = None):
         try:
-            if typeof == 'string':
+            if typeof == 'string' or typeof == 'int':
                 seted_type = "string"
             elif typeof == 'fixed':
                 seted_type = {
@@ -34,7 +34,7 @@ class SchemaBody:
                     "type": "long"
                 }
             else:
-                raise f"Unknown Type Error: {typeof}"
+                raise Exception(f"Unknown Type Error: {typeof}")
             return seted_type
         except Exception as e:
             print(e)
@@ -51,14 +51,14 @@ class SchemaBody:
         if is_nullable:
             node = {
                 "default": "null",
-                "doc": description,
+                "doc": repr(description),
                 "name": name,
                 "type": ["null", self._set_type(type_of, size=size, name=name)],
             }
 
         else:
             node = {
-                "doc": description,
+                "doc": repr(description),
                 "name": name,
                 "type": self._set_type(type_of, size=size, name=name),
             }
